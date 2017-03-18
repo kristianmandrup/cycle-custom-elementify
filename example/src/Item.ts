@@ -1,6 +1,6 @@
-import xs, {Stream} from 'xstream';
-import {button, div, input, VNode} from '@cycle/dom';
-import {DOMSource} from '@cycle/dom/xstream-typings';
+import xs, { Stream } from 'xstream';
+import { button, div, input, VNode } from '@cycle/dom';
+import { DOMSource } from '@cycle/dom';
 
 export interface Action {
   type: 'CHANGE_COLOR' | 'CHANGE_WIDTH' | 'REMOVE';
@@ -29,7 +29,7 @@ function intent(domSource: DOMSource): Stream<Action> {
       } as Action)),
 
     domSource.select('.remove-btn').events('click')
-      .mapTo({type: 'REMOVE'} as Action)
+      .mapTo({ type: 'REMOVE' } as Action)
   );
 }
 
@@ -42,21 +42,21 @@ function model(props$: Stream<Props>, action$: Stream<Action>): Stream<State> {
   const changeWidthReducer$ = action$
     .filter(a => a.type === 'CHANGE_WIDTH')
     .map(action => function changeWidthReducer(oldState: State): State {
-      return {color: oldState.color, width: action.payload};
+      return { color: oldState.color, width: action.payload };
     });
 
   const changeColorReducer$ = action$
     .filter(a => a.type === 'CHANGE_COLOR')
     .map(action => function changeColorReducer(oldState: State): State {
-      return {color: action.payload, width: oldState.width};
+      return { color: action.payload, width: oldState.width };
     });
 
   return xs.merge(usePropsReducer$, changeWidthReducer$, changeColorReducer$)
-    .fold((state, reducer) => reducer(state), {color: '#888', width: 200});
+    .fold((state, reducer) => reducer(state), { color: '#888', width: 200 });
 }
 
 function view(state$: Stream<State>) {
-  return state$.map(({color, width}) => {
+  return state$.map(({ color, width }) => {
     const style = {
       border: '1px solid #000',
       background: 'none repeat scroll 0% 0% ' + color,
@@ -66,13 +66,13 @@ function view(state$: Stream<State>) {
       padding: '20px',
       margin: '10px 0px'
     };
-    return div('.item', {style}, [
+    return div('.item', { style }, [
       input('.color-field', {
-        attrs: {type: 'text', value: color}
+        attrs: { type: 'text', value: color }
       }),
       div('.slider-container', [
         input('.width-slider', {
-          attrs: {type: 'range', min: '200', max: '1000', value: width}
+          attrs: { type: 'range', min: '200', max: '1000', value: width }
         })
       ]),
       div('.width-content', String(width)),

@@ -2,7 +2,7 @@
 
 ##### Experimental
 
-Helper function that takes a Cycle.js component (`(sources: Sources) => Sinks`) and returns a JavaScript class that can be registered as a Web Component custom element with `document.customElements.define`:
+Helper function that takes a Cycle.js component (`(sources: Sources) => Sinks`) and returns a JavaScript class that can be registered as a Web Component custom element with `window.customElements.define`:
 
 ```js
 import customElementify from 'cycle-custom-elementify';
@@ -12,7 +12,7 @@ function main(sources) {
 }
 
 const customElementClass = customElementify(main);
-document.registerElement('my-web-component', { prototype: customElementClass });
+window.customElements.define('my-web-component', customElementClass);
 ```
 
 ```html
@@ -71,14 +71,14 @@ const customElementClass = customElementify(MyButton);
 Then, register your custom element on the DOM with a tagName of your choice:
 
 ```js
-document.customElements.define('my-button', customElementClass);
+window.customElements.define('my-button', customElementClass);
 ```
 
 If you want to use this `my-button` inside another Cycle.js app, be careful to wait for the `WebComponentsReady` event first:
 
 ```js
 window.addEventListener('WebComponentsReady', () => {
-  document.customElements.define('my-button', { is: customElementify(MyButton) });
+  window.customElements.define('my-button', customElementify(MyButton));
   Cycle.run(main, {
     DOM: makeDOMDriver('#app-container')
   });
@@ -107,6 +107,89 @@ function MyButton(sources) {
 
   // ...
 }
+```
+
+## Custom Elements v1
+
+See [MDN: Custom Elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Custom_Elements) and [Custom Elements v1: Getting started](https://developers.google.com/web/fundamentals/getting-started/primers/customelements)
+
+- `constructor`	An instance of the element is created or upgraded. Useful for initializing state, settings up event listeners, or creating shadow dom. See the spec for restrictions on what you can do in the constructor.
+- `connectedCallback`	Called every time the element is inserted into the DOM. Useful for running setup code, such as fetching resources or rendering. Generally, you should try to delay work until this time.
+- `disconnectedCallback`	Called every time the element is removed from the DOM. Useful for running clean up code (removing event listeners, etc.).
+- `attributeChangedCallback(attrName, oldVal, newVal)`	An attribute was added, removed, updated, or replaced. Also called for initial values when an element is created by the parser, or upgraded. Note: only attributes listed in the `observedAttributes` property will receive this callback.
+- `adoptedCallback()`	The custom element has been moved into a new document (e.g. someone called `document.adoptNode(el)`).
+
+Elements can react to attribute changes by defining a `attributeChangedCallback`. The browser will call this method for every change to attributes listed in the `observedAttributes` array (static getter).
+
+```js
+class AppDrawer extends HTMLElement {
+  ...
+
+  static get observedAttributes() {
+    return ['disabled', 'open'];
+  }
+
+  // Only called for the disabled and open attributes due to observedAttributes
+  attributeChangedCallback(name, oldValue, newValue) {
+    // When the drawer is disabled, update keyboard/screen reader behavior.
+    if (this.disabled) {
+      // ...
+    }
+  }
+}
+```
+
+To know when a tag name becomes defined, you can use `window.customElements.whenDefined()`. It vends a `Promise` that resolves when the element becomes defined.
+
+```js
+customElements.whenDefined('app-drawer').then(() => {
+  console.log('app-drawer defined');
+});
+```
+
+### Shadow DOM
+
+To use Shadow DOM in a custom element, call `this.attachShadow` inside your `constructor`:
+
+```js
+customElements.define('x-foo-shadowdom', class extends HTMLElement {
+  constructor() {
+    super(); // always call super() first in the ctor.
+
+    // Attach a shadow root to the element.
+    let shadowRoot = this.attachShadow({mode: 'open'});
+    shadowRoot.innerHTML = `
+      <style>:host { ... }</style> <!-- look ma, scoped styles -->
+      <b>I'm in shadow dom!</b>
+      <slot></slot>
+    `;
+  }
+  ...
+});
+```
+
+### Templating
+
+```html
+<template id="x-foo-from-template">
+  <style>
+    p { color: orange; }
+  </style>
+  <p>I'm in Shadow DOM. My markup was stamped from a &lt;template&gt;.</p>
+</template>
+
+<script>
+  customElements.define('x-foo-from-template', class extends HTMLElement {
+    constructor() {
+      super(); // always call super() first in the ctor.
+      let shadowRoot = this.attachShadow({mode: 'open'});
+      const t = document.querySelector('#x-foo-from-template');
+      const instance = t.content.cloneNode(true);
+      shadowRoot.appendChild(instance);
+    }
+    ...
+  });
+</script>
 ```
 
 ## Scripts

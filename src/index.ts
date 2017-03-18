@@ -21,10 +21,10 @@ type CycleExec = {
 }
 
 export interface CustomElementV1 {
-  createdCallback(): void;
-  attachedCallback(): void;
-  detachedCallback(): void;
-  attributeChangedCallback(attrName: string): void;
+  connectedCallback(): void;
+  disconnectedCallback(): void;
+  attributeChangedCallback(attributeName: string, oldValue: any, newValue: any, namespace: string): void;
+  adoptedCallback(oldDocument: any, newDocument: any): void;
 }
 
 export interface CyclejsCustomElement extends CustomElementV1 {
@@ -80,7 +80,7 @@ function makePropsObject(element: HTMLElement): Object {
 export default function customElementify(component: Component): typeof HTMLElement {
   var CEPrototype = Object.create(HTMLElement.prototype) as any as (CyclejsCustomElement & typeof HTMLElement);
 
-  CEPrototype.attachedCallback = function attachedCallback() {
+  CEPrototype.connectedCallback = function connectedCallback() {
     const self: CyclejsCustomElement & HTMLElement = this;
     self._cyclejsProps$ = xs.create<any>();
     const { sources, sinks, run } = Cycle(component, {
@@ -93,14 +93,14 @@ export default function customElementify(component: Component): typeof HTMLEleme
     self._cyclejsProps$.shamefullySendNext(self._cyclejsProps);
   };
 
-  CEPrototype.detachedCallback = function detachedCallback() {
+  CEPrototype.disconnectedCallback = function disconnectedCallback() {
     (this as CyclejsCustomElement)._cyclejsDispose();
   };
 
-  CEPrototype.attributeChangedCallback = function attributeChangedCallback(attrName: string) {
+  CEPrototype.attributeChangedCallback = function attributeChangedCallback(attributeName: string, oldValue: any, newValue: any, namespace: string) {
     const self: CyclejsCustomElement & HTMLElement = this;
     if (!self._cyclejsProps) return;
-    self._cyclejsProps[attrName] = self.attributes.getNamedItem(attrName).value;
+    self._cyclejsProps[attributeName] = self.attributes.getNamedItem(attributeName).value;
     self._cyclejsProps$.shamefullySendNext(self._cyclejsProps);
   };
 

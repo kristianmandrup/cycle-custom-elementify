@@ -3,7 +3,7 @@ import { run } from '@cycle/xstream-run';
 import { h, VNode, makeDOMDriver } from '@cycle/dom';
 import Item from './Item';
 import List from './List';
-import { DOMSource } from '@cycle/dom/xstream-typings';
+import { DOMSource } from '@cycle/dom';
 import customElementify from 'cycle-custom-elementify';
 
 interface Sources {

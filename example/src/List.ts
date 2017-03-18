@@ -1,6 +1,6 @@
-import xs, {Stream} from 'xstream';
-import {button, VNode, h, div} from '@cycle/dom';
-import {DOMSource} from '@cycle/dom/xstream-typings';
+import xs, { Stream } from 'xstream';
+import { button, VNode, h, div } from '@cycle/dom';
+import { DOMSource } from '@cycle/dom/xstream-typings';
 
 export interface Sources {
   DOM: DOMSource;
@@ -24,10 +24,10 @@ export interface Action {
 function intent(domSource: DOMSource): Stream<Action> {
   return xs.merge(
     domSource.select('.add-one-btn').events('click')
-      .mapTo({type: 'ADD_ITEM', payload: 1} as Action),
+      .mapTo({ type: 'ADD_ITEM', payload: 1 } as Action),
 
     domSource.select('.add-many-btn').events('click')
-      .mapTo({type: 'ADD_ITEM', payload: 1000} as Action),
+      .mapTo({ type: 'ADD_ITEM', payload: 1000 } as Action),
 
     domSource.select('.item').events('remove')
       .map((ev: CustomEvent) =>
@@ -46,7 +46,7 @@ function model(action$: Stream<Action>): Stream<Array<ItemData>> {
     }
     hexColor = '#' + hexColor;
     const randomWidth = Math.floor(Math.random() * 800 + 200);
-    return {color: hexColor, width: randomWidth, id: mutableId++};
+    return { color: hexColor, width: randomWidth, id: mutableId++ };
   }
 
   const addItemReducer$ = action$
