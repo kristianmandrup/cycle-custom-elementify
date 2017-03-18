@@ -1,23 +1,38 @@
 import xs, { Stream, Listener } from 'xstream';
 import { VNode, h, makeDOMDriver } from '@cycle/dom';
-import Cycle from '@cycle/run';
+import { run as Cycle, Sources, Sinks, Drivers, setup, DisposeFunction } from '@cycle/run';
 import { DOMSource } from '@cycle/dom';
 
-export interface RequiredSources {
+export interface RequiredSources extends Sources {
   DOM: DOMSource;
   props: Stream<Object>;
 }
 
-export interface RequiredSinks {
+export interface RequiredSinks extends Sinks {
   DOM: Stream<VNode>;
 }
 
 export type Component = (sources: RequiredSources) => RequiredSinks;
 
-type CycleExec = {
-  sources: RequiredSources;
-  sinks: RequiredSinks;
-  run: () => () => {};
+export type CycleExec = {
+  sources: Sources,
+  sinks: Sinks;
+  run: DisposeFunction
+}
+
+export function cycleExecRun<So extends Sources, Si extends Sinks>(
+  main: (sources: So) => Si,
+  drivers: Drivers<So, Si>): CycleExec {
+  const { run, sinks, sources } = setup(main, drivers);
+  if (typeof window !== 'undefined' && window['CyclejsDevTool_startGraphSerializer']) {
+    window['CyclejsDevTool_startGraphSerializer'](sinks);
+  }
+  // hmm!?
+  return {
+    sources,
+    sinks,
+    run
+  };
 }
 
 export interface CustomElementV1 {
@@ -83,12 +98,12 @@ export default function customElementify(component: Component): typeof HTMLEleme
   CEPrototype.connectedCallback = function connectedCallback() {
     const self: CyclejsCustomElement & HTMLElement = this;
     self._cyclejsProps$ = xs.create<any>();
-    const { sources, sinks, run } = Cycle(component, {
+    const { sources, sinks, run } = cycleExecRun(component, {
       DOM: makeDOMDriver(self),
       props: () => self._cyclejsProps$
     }) as CycleExec;
     sources.DOM.elements().addListener(createDispatcherForAllSinks(sinks));
-    self._cyclejsDispose = run();
+    self._cyclejsDispose = run;
     self._cyclejsProps = makePropsObject(self);
     self._cyclejsProps$.shamefullySendNext(self._cyclejsProps);
   };
