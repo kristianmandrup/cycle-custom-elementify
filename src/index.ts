@@ -1,7 +1,7 @@
-import xs, {Stream, Listener} from 'xstream';
-import {VNode, h, makeDOMDriver} from '@cycle/dom';
-import Cycle from '@cycle/xstream-run';
-import {DOMSource} from '@cycle/dom/xstream-typings';
+import xs, { Stream, Listener } from 'xstream';
+import { VNode, h, makeDOMDriver } from '@cycle/dom';
+import Cycle from '@cycle/run';
+import { DOMSource } from '@cycle/dom';
 
 export interface RequiredSources {
   DOM: DOMSource;
@@ -20,14 +20,14 @@ type CycleExec = {
   run: () => () => {};
 }
 
-export interface CustomElementV0 {
+export interface CustomElementV1 {
   createdCallback(): void;
   attachedCallback(): void;
   detachedCallback(): void;
   attributeChangedCallback(attrName: string): void;
 }
 
-export interface CyclejsCustomElement extends CustomElementV0 {
+export interface CyclejsCustomElement extends CustomElementV1 {
   _cyclejsProps$: Stream<Object>;
   _cyclejsProps: Object;
   _cyclejsDispose(): void;
@@ -83,7 +83,7 @@ export default function customElementify(component: Component): typeof HTMLEleme
   CEPrototype.attachedCallback = function attachedCallback() {
     const self: CyclejsCustomElement & HTMLElement = this;
     self._cyclejsProps$ = xs.create<any>();
-    const {sources, sinks, run} = Cycle(component, {
+    const { sources, sinks, run } = Cycle(component, {
       DOM: makeDOMDriver(self),
       props: () => self._cyclejsProps$
     }) as CycleExec;

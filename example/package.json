@@ -5,20 +5,20 @@
   "author": "Andre Staltz",
   "license": "MIT",
   "dependencies": {
-    "@cycle/dom": "12.2.x",
-    "@cycle/xstream-run": "3.1.x",
-    "cycle-custom-elementify": "^1.0.0",
-    "webcomponents.js": "^0.7.22",
-    "xstream": "6.2.x"
+    "@cycle/dom": "^16.x",
+    "@cycle/run": "^3.x",
+    "xstream": "^10.x",
+    "cycle-custom-elementify": "^1.0.0"
   },
   "devDependencies": {
-    "babel-preset-es2015": "^6.3.13",
-    "babel-register": "^6.4.3",
-    "babelify": "^7.2.0",
-    "browserify": "11.0.1",
+    "babel-preset-es2015": "^6.x",
+    "babel-register": "^6.x",
+    "babelify": "^7.x",
+    "browserify": "^11.x",
+    "browserify-shim": "^3.8.12",
     "mkdirp": "0.5.x",
-    "typescript": "1.8.7",
-    "typings": "^1.0.4"
+    "typescript": "^2.2.x",
+    "typings": "^2.1.x"
   },
   "scripts": {
     "prebrowserify": "mkdirp dist && typings install && tsc",

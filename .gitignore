@@ -14,3 +14,4 @@ ignore/
 dist/
 lib/
 typings/
+bower_components

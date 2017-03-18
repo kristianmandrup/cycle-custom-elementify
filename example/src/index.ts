@@ -1,9 +1,9 @@
-import xs, {Stream} from 'xstream';
-import {run} from '@cycle/xstream-run';
-import {h, VNode, makeDOMDriver} from '@cycle/dom';
+import xs, { Stream } from 'xstream';
+import { run } from '@cycle/xstream-run';
+import { h, VNode, makeDOMDriver } from '@cycle/dom';
 import Item from './Item';
 import List from './List';
-import {DOMSource} from '@cycle/dom/xstream-typings';
+import { DOMSource } from '@cycle/dom/xstream-typings';
 import customElementify from 'cycle-custom-elementify';
 
 interface Sources {
@@ -19,7 +19,7 @@ function main(sources: Sources): Sinks {
 }
 
 window.addEventListener('WebComponentsReady', () => {
-  (document as any).registerElement('many-item', { prototype: customElementify(Item as any) });
+  (document as any).customeElement.define('many-item', { is: customElementify(Item as any) });
   run(main, {
     DOM: makeDOMDriver('#main-container')
   });
