@@ -109,6 +109,16 @@ function MyButton(sources) {
 }
 ```
 
+## Compile and Run example app
+
+```bash
+$ cd example
+$ npm i
+$ npm run prebrowserify && npm run browserify
+$ npm start
+```
+
+
 ## Custom Elements v1
 
 See [MDN: Custom Elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Custom_Elements) and [Custom Elements v1: Getting started](https://developers.google.com/web/fundamentals/getting-started/primers/customelements)

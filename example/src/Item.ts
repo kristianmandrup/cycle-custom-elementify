@@ -81,17 +81,17 @@ function view(state$: Stream<State>) {
   });
 }
 
-export interface Sources {
+export interface ItemSources {
   DOM: DOMSource;
   props: Stream<Props>;
 }
 
-export interface Sinks {
+export interface ItemSinks {
   DOM: Stream<VNode>;
   remove: Stream<any>;
 }
 
-function Item(sources: Sources): Sinks {
+function Item(sources: ItemSources): ItemSinks {
   const action$ = intent(sources.DOM);
   const state$ = model(sources.props, action$);
   const vtree$ = view(state$);

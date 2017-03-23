@@ -1,20 +1,20 @@
 import xs, { Stream } from 'xstream';
-import { run } from '@cycle/xstream-run';
+import { run } from '@cycle/run';
 import { h, VNode, makeDOMDriver } from '@cycle/dom';
 import Item from './Item';
 import List from './List';
 import { DOMSource } from '@cycle/dom';
 import customElementify from 'cycle-custom-elementify';
 
-interface Sources {
+interface MainSources {
   DOM: DOMSource;
 }
 
-interface Sinks {
+type MainSinks = {
   DOM: Stream<VNode>;
 }
 
-function main(sources: Sources): Sinks {
+function main(sources: MainSources): MainSinks {
   return List(sources);
 }
 

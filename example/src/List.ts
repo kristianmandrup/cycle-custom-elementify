@@ -1,12 +1,13 @@
 import xs, { Stream } from 'xstream';
 import { button, VNode, h, div } from '@cycle/dom';
-import { DOMSource } from '@cycle/dom/xstream-typings';
+import { DOMSource } from '@cycle/dom';
+import { Sources, Sinks } from '@cycle/run';
 
-export interface Sources {
+export interface ListSources extends Sources {
   DOM: DOMSource;
 }
 
-export interface Sinks {
+export interface ListSinks extends Sinks {
   DOM: Stream<VNode>;
 }
 
@@ -89,7 +90,7 @@ function view(items$: Stream<Array<ItemData>>) {
   );
 }
 
-export default function List(sources: Sources): Sinks {
+export default function List(sources: ListSources): ListSinks {
   const action$ = intent(sources.DOM);
   const items$ = model(action$);
   const vdom$ = view(items$);
